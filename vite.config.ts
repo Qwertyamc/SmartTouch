@@ -37,10 +37,15 @@ export default defineConfig({
     }
   },
   build: {
+    commonjsOptions: {
+      include: []
+    },
     rollupOptions: {
       plugins: [
+        // Enable rollup polyfills plugin
+        // used during production bundling
         rollupNodePolyFill()
       ]
     }
-  }
+  },
 })
