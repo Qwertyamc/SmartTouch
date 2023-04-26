@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import * as mqtt from "mqtt"
+//import * as mqtt from "mqtt"
 
 const loaded = ref(false);
 const result = ref(false);
