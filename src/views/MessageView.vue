@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import * as mqtt from "mqtt"
+import { connect } from "mqtt"
 
 const loaded = ref(false);
 const result = ref(false);
@@ -12,7 +12,7 @@ let client = undefined;
 onMounted(()=>{
   const IP = sessionStorage.getItem("IP");
 
-  client = mqtt.connect('wss://'+IP+':9001');
+  client = connect('wss://'+IP+':9001');
 
   client.on("connect", onConnect);
   client.on("disconnect", onConnectionLost);
