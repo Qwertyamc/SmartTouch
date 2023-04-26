@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import * as mqtt from "mqtt"
 
 const loaded = ref(false);
 const result = ref(false);
@@ -11,16 +12,14 @@ let client = undefined;
 onMounted(()=>{
   const IP = sessionStorage.getItem("IP");
 
-  client = new Paho.MQTT.Client(IP, 9001, "PC");
+  client = mqtt.connect('wss://'+IP+':9001');
 
-  // set callback handlers
-  client.onConnectionLost = onConnectionLost;
-  client.onMessageArrived = onMessageArrived;
+  client.on("connect", onConnect);
+  client.on("disconnect", onConnectionLost);
 
-  // connect the client
-  client.connect({onSuccess:onConnect})
+  client.on("message", onMessageArrived);
 
-  setTimeout(()=>{if(!client.isConnected()) loaded.value = true;}, 5000);
+  setTimeout(()=>{if(!client.connected) loaded.value = true;}, 5000);
 
   console.log(client);
 });
@@ -28,7 +27,7 @@ onMounted(()=>{
 // called when the client connects
 function onConnect() {
   // Once a connection has been made, make a subscription and send a message.
-  console.log("onConnect");
+  console.log("Connected");
   client.subscribe("touch_topic");
 
   loaded.value = true;
@@ -43,9 +42,9 @@ function onConnectionLost(responseObject) {
 }
 
 // called when a message arrives
-function onMessageArrived(m) {
-  message.value = m.payloadString;
-  console.log("onMessageArrived:"+m.payloadString);
+function onMessageArrived(topic, m) {
+  message.value = m.toString();
+  console.log("onMessageArrived:"+m.toString());
 }
 
 function handleClick(){
