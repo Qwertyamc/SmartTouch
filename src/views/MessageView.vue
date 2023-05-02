@@ -58,13 +58,15 @@ function onMessageArrived(topic, m) {
   message.value = m.toString();
   console.log("Message arrived: "+m.toString());
 
-  speech.speak({
-    text: m.toString(),
-  }).then(() => {
-      console.log("Success !")
-  }).catch(e => {
-      console.error("An error occurred :", e)
-  })
+  if(speech.hasBrowserSupport()){
+    speech.speak({
+      text: m.toString(),
+    }).then(() => {
+        console.log("Success !");
+    }).catch(e => {
+        console.error("An error occurred :", e);
+    })
+  }
 }
 
 function handleClick(){
