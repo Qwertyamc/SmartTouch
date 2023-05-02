@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-//import * as mqtt from "mqtt"
+import Speech from 'speak-tts';
 
 const loaded = ref(false);
 const result = ref(false);
@@ -9,10 +9,22 @@ const message = ref("");
 
 let client = undefined;
 
+const speech = new Speech();
+if(speech.hasBrowserSupport()) { 
+    console.log("speech synthesis supported");
+
+    speech.init().then((data) => {
+    console.log("Speech is ready, voices are available", data);
+    }).catch(e => {
+        console.error("An error occured while initializing : ", e);
+    })
+}
+
 onMounted(()=>{
   const IP = sessionStorage.getItem("IP");
 
-  client = mqtt.connect('wss://'+IP+':9001');
+  //client = mqtt.connect('wss://'+IP+':9001');
+  client = mqtt.connect('wss://test.mosquitto.org:8081');
 
   client.on("connect", onConnect);
   client.on("disconnect", onConnectionLost);
@@ -37,20 +49,32 @@ function onConnect() {
 // called when the client loses its connection
 function onConnectionLost(responseObject) {
   if (responseObject.errorCode !== 0) {
-    console.log("Lost connection:"+responseObject.errorMessage);
+    console.log("Lost connection: "+responseObject.errorMessage);
   }
 }
 
 // called when a message arrives
 function onMessageArrived(topic, m) {
   message.value = m.toString();
-  console.log("onMessageArrived:"+m.toString());
+  console.log("Message arrived: "+m.toString());
+
+  speech.speak({
+    text: m.toString(),
+  }).then(() => {
+      console.log("Success !")
+  }).catch(e => {
+      console.error("An error occurred :", e)
+  })
 }
 
 function handleClick(){
   window.location.reload();
 }
 
+// DELETE THIS
+function sendMessage(){
+  client.publish('touch_topic', 'Hello world');
+}
 </script>
 
 <template>
@@ -69,6 +93,8 @@ function handleClick(){
     <div class="text-h4 message-title">The recieved message was:</div>
     <v-sheet color="primary" rounded elevation="4" class="text-h5 message-box">{{ message }}</v-sheet>
     <router-link to="/"><v-btn color='primary'>Back</v-btn></router-link>
+    <!-- DELETE THIS -->
+    <v-btn color='secondary' @click="sendMessage">Send</v-btn>
   </div>
 </template>
 
