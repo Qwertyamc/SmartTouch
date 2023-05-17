@@ -23,7 +23,7 @@ if(speech.hasBrowserSupport()) {
 onMounted(()=>{
   const IP = sessionStorage.getItem("IP");
 
-  client = mqtt.connect('ws://'+IP+':9001');
+  client = mqtt.connect('wss://'+IP+':9001');
   //client = mqtt.connect('wss://test.mosquitto.org:8081');
 
   client.on("connect", onConnect);
