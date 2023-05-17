@@ -23,8 +23,8 @@ if(speech.hasBrowserSupport()) {
 onMounted(()=>{
   const IP = sessionStorage.getItem("IP");
 
-  //client = mqtt.connect('wss://'+IP+':9001');
-  client = mqtt.connect('wss://test.mosquitto.org:8081');
+  client = mqtt.connect('ws://'+IP+':9001');
+  //client = mqtt.connect('wss://test.mosquitto.org:8081');
 
   client.on("connect", onConnect);
   client.on("disconnect", onConnectionLost);
@@ -57,16 +57,6 @@ function onConnectionLost(responseObject) {
 function onMessageArrived(topic, m) {
   message.value = m.toString();
   console.log("Message arrived: "+m.toString());
-
-  if(speech.hasBrowserSupport()){
-    speech.speak({
-      text: m.toString(),
-    }).then(() => {
-        console.log("Success !");
-    }).catch(e => {
-        console.error("An error occurred :", e);
-    })
-  }
 }
 
 function handleClick(){
@@ -74,29 +64,41 @@ function handleClick(){
 }
 
 // DELETE THIS
-function sendMessage(){
-  client.publish('touch_topic', 'Hello world');
+function hearMessage(){
+  if(speech.hasBrowserSupport()){
+    speech.speak({
+      text: message.value
+    }).then(() => {
+        console.log("Success !");
+    }).catch(e => {
+        console.error("An error occurred :", e);
+    })
+  }
 }
 </script>
 
 <template>
-  <div v-if="!loaded" class="text-h4">
+  <div v-if="!loaded" class="text-h3">
     Loading...
   </div>
   <div v-else-if="!result" class="wrapper">
-    <div class="text-h4">Could not connect to the MQTT broker</div>
-    <div class="text-body-1">Perhaps the broker is not operable at this moment.</div>
-    <div class="text-body-1">Are you sure it is the correct IP?</div>
+    <div class="text-h4 pad-down"><Strong>Could not connect to the MQTT broker</Strong></div>
+    <div class="text-h5 pad-down">Perhaps the broker is not operable at this moment.</div>
+    <div class="text-h6 pad-down">Are you sure it is the correct IP?</div>
     <div class="button-wrapper">
-      <v-btn color='secondary' @click="handleClick">Refresh</v-btn><router-link to="/"><v-btn color='primary'>Back</v-btn></router-link>
+      <v-btn color='secondary' @click="handleClick" size="large">Refresh</v-btn><router-link to="/"><v-btn color='primary' size="large">Back</v-btn></router-link>
     </div>
   </div>
   <div v-else class="wrapper success">
     <div class="text-h4 message-title">The recieved message was:</div>
     <v-sheet color="primary" rounded elevation="4" class="text-h5 message-box">{{ message }}</v-sheet>
-    <router-link to="/"><v-btn color='primary'>Back</v-btn></router-link>
+    <div class="button-wrapper">
+      <v-btn color='secondary' @click="hearMessage" size="large">Hear out!</v-btn>
+      <router-link to="/"><v-btn color='primary' size="large">Back</v-btn></router-link>
+    </div>
+    
     <!-- DELETE THIS -->
-    <v-btn color='secondary' @click="sendMessage">Send</v-btn>
+    
   </div>
 </template>
 
@@ -114,6 +116,7 @@ function sendMessage(){
 }
 
 .button-wrapper{
+  width: 100%;
   display: flex;
   justify-content: space-around;
   margin-top: 1rem;
@@ -128,5 +131,9 @@ function sendMessage(){
   padding: 2rem;
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.pad-down{
+  margin-bottom: 1rem;
 }
 </style>

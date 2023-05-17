@@ -17,16 +17,16 @@ function handleClick(){
 
 <template>
   <div class="card-wrapper">
-    <div class="text-h4">
-      Welcome to the message reception board!
+    <div class="text-h4 pad-down">
+      Connect to your MQTT Broker!
     </div>
-    <div class="text-body-1">
+    <div class="text-h5 pad-down">
       Write down the IP you want to connect to:
     </div>
     <v-text-field label="IP" variant="outlined" placeholder="XXX.XXX.XXX.XXX" v-model="IPtext"></v-text-field>
-    <div class="text-body-2 text-red-accent-4">{{ helper }}</div>
+    <div class="text-body-1 text-red-accent-4">{{ helper }}</div>
     <div class="button-wrapper">
-      <v-btn color='primary' @click="handleClick">submit</v-btn>
+      <v-btn color='primary' @click="handleClick" size="x-large">submit</v-btn>
     </div>
   </div>
 </template>
@@ -43,5 +43,9 @@ function handleClick(){
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
+}
+
+.pad-down{
+  margin-bottom: 1rem;
 }
 </style>
